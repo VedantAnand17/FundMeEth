@@ -8,12 +8,12 @@ pragma solidity ^0.8.18;
 import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
 
 contract FundMe {
-    uint256 minUSD = 5;
+    uint256 minUSD = 5 * 1e18;
 
     function fund() public payable {
         // Allow users to send money
         // Have a minimum amount sent
-        require(msg.value >= minUSD, "Not enough ETH");
+        require(getConversionRate(msg.value) >= minUSD, "Not enough ETH");
     }
 
     function getPrice() public view returns (uint256) {
@@ -25,7 +25,11 @@ contract FundMe {
         return uint256(answer * 1e10);
     }
 
-    function getConversionRate() public {}
+    function getConversionRate(uint256 _amount) public view returns (uint256) {
+        uint256 ethPrice = getPrice();
+        uint256 ethAmountInUSD = (_amount * ethPrice) / 1e18;
+        return ethAmountInUSD;
+    }
 
     // function withdraw() public {}
 
