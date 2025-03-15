@@ -9,7 +9,7 @@ import {PriceConverter} from "./PriceConverter.sol";
 
 contract FundMe {
     using PriceConverter for uint256;
-    uint256 minUSD = 5 * 1e18;
+    uint256 public minUSD = 5 * 1e18;
 
     address[] public funders;
     mapping(address => uint256) public addressToAmountFunded;
@@ -21,7 +21,7 @@ contract FundMe {
     }
 
     modifier onlyOwner() {
-        require(msg.sender == owner,"Must be owner!");
+        require(msg.sender == owner, "Must be owner!");
         _;
     }
 
