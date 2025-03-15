@@ -17,7 +17,12 @@ contract FundMe {
     address public owner;
 
     constructor() {
-        owner = msg.sender;
+        owner = msg.sender; //contract deploys once and then deployer is set as the owner
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner,"Must be owner!");
+        _;
     }
 
     function fund() public payable {
@@ -28,8 +33,7 @@ contract FundMe {
         addressToAmountFunded[msg.sender] += msg.value;
     }
 
-    function withdraw() public {
-        require(msg.sender == owner, "Must be owner!");
+    function withdraw() public onlyOwner {
         // for( startIndex, EndIndex, increment/decrement)
         for (
             uint256 fundersIndex = 0;
