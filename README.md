@@ -9,17 +9,17 @@ A production-ready, gas-optimized crowdfunding smart contract that enables secur
 ## 📊 System Architecture
 
 ```mermaid
-graph TD
-    A[User] -->|Send ETH| B[FundMe Contract]
-    B -->|Check Amount| C{Minimum USD?}
-    C -->|Yes| D[Store Funder]
-    C -->|No| E[Revert]
-    D -->|Update| F[Mapping]
-    D -->|Add to| G[Funders Array]
-    H[Owner] -->|Withdraw| I{Authorization}
-    I -->|Success| J[Transfer ETH]
-    I -->|Fail| K[Revert]
-    B -->|Get Price| L[Chainlink Oracle]
+flowchart TD
+    User([User]) -->|Send ETH| FundMe[FundMe Contract]
+    FundMe -->|Check Amount| MinCheck{Minimum USD?}
+    MinCheck -->|Yes| Store[Store Funder]
+    MinCheck -->|No| Revert[Revert]
+    Store -->|Update| Mapping[(Mapping)]
+    Store -->|Add to| Array[(Funders Array)]
+    Owner([Owner]) -->|Withdraw| Auth{Authorization}
+    Auth -->|Success| Transfer[Transfer ETH]
+    Auth -->|Fail| RevertAuth[Revert]
+    FundMe -->|Get Price| Oracle[(Chainlink Oracle)]
 ```
 
 ## 🔄 Contract Flow
@@ -27,33 +27,33 @@ graph TD
 ### Funding Process
 ```mermaid
 sequenceDiagram
-    participant User
+    actor User
     participant FundMe
     participant PriceConverter
     participant Chainlink
 
-    User->>FundMe: Send ETH
-    FundMe->>PriceConverter: Get ETH/USD Rate
-    PriceConverter->>Chainlink: Query Price Feed
-    Chainlink-->>PriceConverter: Return Current Price
-    PriceConverter-->>FundMe: Return USD Value
+    User->>+FundMe: Send ETH
+    FundMe->>+PriceConverter: Get ETH/USD Rate
+    PriceConverter->>+Chainlink: Query Price Feed
+    Chainlink-->>-PriceConverter: Return Current Price
+    PriceConverter-->>-FundMe: Return USD Value
     FundMe->>FundMe: Validate Amount
     FundMe->>FundMe: Store Funder
-    FundMe-->>User: Confirm Transaction
+    FundMe-->>-User: Confirm Transaction
 ```
 
 ### Withdrawal Process
 ```mermaid
 sequenceDiagram
-    participant Owner
+    actor Owner
     participant FundMe
     participant Funders
 
-    Owner->>FundMe: Request Withdrawal
+    Owner->>+FundMe: Request Withdrawal
     FundMe->>FundMe: Verify Owner
     FundMe->>Funders: Reset Balances
     FundMe->>FundMe: Clear Funders Array
-    FundMe->>Owner: Transfer ETH
+    FundMe->>-Owner: Transfer ETH
 ```
 
 ## 🚀 Quick Start
@@ -97,13 +97,13 @@ sequenceDiagram
 
 ### Security Architecture
 ```mermaid
-graph TD
-    A[Access Control] -->|Owner Only| B[Withdrawal]
-    C[Input Validation] -->|Minimum USD| D[Funding]
-    E[Storage Safety] -->|Immutable| F[Owner Address]
-    E -->|Constant| G[Minimum USD]
-    H[Arithmetic Safety] -->|SafeMath| I[Calculations]
-    J[Reentrancy Guard] -->|State Updates| K[Before Transfer]
+flowchart TD
+    Access([Access Control]) -->|Owner Only| Withdrawal[Withdrawal]
+    Input([Input Validation]) -->|Minimum USD| Funding[Funding]
+    Storage([Storage Safety]) -->|Immutable| OwnerAddr[Owner Address]
+    Storage -->|Constant| MinUSD[Minimum USD]
+    Safety([Arithmetic Safety]) -->|SafeMath| Calc[Calculations]
+    Guard([Reentrancy Guard]) -->|State Updates| StateUpdate[Before Transfer]
 ```
 
 ### Security Measures
@@ -132,11 +132,17 @@ contract FundMe {
 
 #### Contract Interaction Flow
 ```mermaid
-graph LR
-    A[External User] -->|fund()| B[FundMe Contract]
-    B -->|getConversionRate()| C[PriceConverter]
-    C -->|getPrice()| D[Chainlink Oracle]
-    E[Owner] -->|withdraw()| B
+flowchart TD
+    User([User]) -->|Send ETH| FundMe[FundMe Contract]
+    FundMe -->|Check Amount| MinCheck{Minimum USD?}
+    MinCheck -->|Yes| Store[Store Funder]
+    MinCheck -->|No| Revert[Revert]
+    Store -->|Update| Mapping[(Mapping)]
+    Store -->|Add to| Array[(Funders Array)]
+    Owner([Owner]) -->|Withdraw| Auth{Authorization}
+    Auth -->|Success| Transfer[Transfer ETH]
+    Auth -->|Fail| RevertAuth[Revert]
+    FundMe -->|Get Price| Oracle[(Chainlink Oracle)]
 ```
 
 #### PriceConverter.sol
@@ -177,13 +183,13 @@ function withdraw() public onlyOwner {
 ### Gas Optimization Techniques
 1. **Storage Optimization**
    ```mermaid
-   graph TD
-       A[Storage Optimization] --> B[Immutable Variables]
-       A --> C[Constant Values]
-       A --> D[Array Management]
-       B --> E[Owner Address]
-       C --> F[Minimum USD]
-       D --> G[Clear on Withdraw]
+   flowchart TD
+       Storage[Storage Optimization] --> Immutable[Immutable Variables]
+       Storage --> Constants[Constant Values]
+       Storage --> Arrays[Array Management]
+       Immutable --> Owner[Owner Address]
+       Constants --> MinUSD[Minimum USD]
+       Arrays --> Clear[Clear on Withdraw]
    ```
 
 2. **Arithmetic Safety**
