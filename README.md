@@ -89,7 +89,7 @@ sequenceDiagram
 ## 🎯 Features
 
 ### Core Functionality
-- **Minimum Funding**: 5 USD equivalent in ETH
+- **Minimum Funding**: 5 USD equivalent in ETH to be funded
 - **Real-time Price Feeds**: Chainlink Oracle integration
 - **Secure Withdrawals**: Owner-only access control
 - **Transparent Tracking**: Public funding history
